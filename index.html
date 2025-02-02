@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Cards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card h1 {
+            font-size: 24px;
+            margin: 0 0 20px;
+        }
+
+        .card p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .buttons button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card" id="card">
+        <h1 id="question">Question</h1>
+        <p id="answer" style="display: none;">Answer</p>
+        <div class="buttons">
+            <button onclick="showAnswer()">Show Answer</button>
+            <button onclick="nextCard()">Next Card</button>
+        </div>
+        <audio id="cardSound" src="sounds/ding.mp3"></audio>
+    </div>
+
+    <script>
+
+        let flashCards = [];
+
+        let currentCardIndex = 0;
+
+        function showAnswer() {
+            document.getElementById('answer').style.display = 'block';
+        }
+
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % flashCards.length;
+            document.getElementById('question').innerText = flashCards[currentCardIndex].question;
+            document.getElementById('answer').innerText = flashCards[currentCardIndex].answer;
+            document.getElementById('answer').style.display = 'none';
+
+            const cardSound = document.getElementById('cardSound');
+            cardSound.play().catch(error => {
+                console.error('Error playing sound:', error);
+            });
+
+            changeCardColor();
+            const utterance = new SpeechSynthesisUtterance(flashCards[currentCardIndex].question);
+            speechSynthesis.speak(utterance);
+        }
+
+        function changeCardColor() {
+            const card = document.getElementById('card');
+            const randomColor = `hsl(${Math.random() * 360}, 100%, 85%)`;
+            card.style.backgroundColor = randomColor;
+        }
+
+
+        function getFlashCards() {
+
+            const flashCards = [
+                { question: "What is the capital of France?", answer: "Paris" },
+                { question: "What is 2 + 2?", answer: "4" },
+                { question: "What is 5 + 2?", answer: "7" },
+                // Add more flash cards here
+            ];
+            return flashCards;
+        }
+        async function fetchFlashCards() {
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbw2jrK1tlTYHqIPNYu0FqbL70htrpu14zi1wm90FW_XEtN1r8C6MfxGTdkQbC2LXKll1A/exec');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                flashCards = data.filter(card => card.question.trim() !== "" && card.answer.trim() !== "");
+                nextCard();
+            } catch (error) {
+                console.error('Error fetching flash cards:', error);
+            }
+        }
+
+
+
+        fetchFlashCards();
+
+       
+
+        // Initial setup to display the first question
+        document.getElementById('question').innerText = flashCards[currentCardIndex].question;
+        document.getElementById('answer').innerText = flashCards[currentCardIndex].answer;
+    </script>
+</body>
+
+</html>
