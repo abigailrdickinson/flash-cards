@@ -59,7 +59,29 @@
 
         .loading {
             display: none;
-            font-size: 24px;
+            width: 100%;
+            height: 4px;
+            background-color: #ddd;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .loading-bar {
+            width: 0;
+            height: 100%;
+            background-color: #4caf50;
+            animation: loading 2s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 100%;
+            }
         }
 
         .disable-sound {
@@ -72,7 +94,9 @@
 </head>
 
 <body>
-    <div class="loading" id="loading">Loading...</div>
+    <div class="loading" id="loading">
+        <div class="loading-bar" id="loading-bar"></div>
+    </div>
     <div class="card" id="card" style="display: none;">
         <h1 id="question">Question</h1>
         <p id="answer" style="display: none;">Answer</p>
@@ -89,7 +113,6 @@
     </div>
 
     <script>
-
         let flashCards = [];
 
         let currentCardIndex = 0;
